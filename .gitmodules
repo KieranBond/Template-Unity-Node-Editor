@@ -1,0 +1,3 @@
+[submodule "Assets/KB/RobotLegs"]
+	path = Assets/KB/RobotLegs
+	url = git@gitlab.com:DBPixelhouse/unity-extensions/robotlegs.git
