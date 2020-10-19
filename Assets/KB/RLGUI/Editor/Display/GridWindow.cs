@@ -8,6 +8,7 @@ namespace KB.RLGUI.Display
 {
     public class GridWindow : EditorWindow
     {
+        private Node _templateNode;
         private List<Node> _nodes;
         private List<Connector> _connections;
 
@@ -16,6 +17,8 @@ namespace KB.RLGUI.Display
 
         private Vector2 _gridOffset;
         private Vector2 _drag;
+        private Vector2 _nodeZoom = new Vector2(0, 1);
+        private Vector2 _gridZoom;
 
         private Rect _leftBar;
 
@@ -50,6 +53,12 @@ namespace KB.RLGUI.Display
 
             CreateBackgroundTextures();
             CreateStyles();
+            CreateTemplateNode();
+        }
+
+        private void CreateTemplateNode()
+        {
+            _templateNode = new Node("", new Rect(Vector2.zero, new Vector2(200, 50)), nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, OnClickInPoint, OnClickOutPoint, OnRemoveNode);
         }
 
         [MenuItem("RLGUI/Open Grid")]
@@ -65,9 +74,9 @@ namespace KB.RLGUI.Display
             LayoutWindow();
 
             //Small lines
-            DrawGrid(20, 0.2f, Color.gray);
+            DrawGrid(20 * _gridZoom.y, 0.2f, Color.gray);
             //Big lines
-            DrawGrid(100, 0.4f, Color.gray);
+            DrawGrid(100 * _gridZoom.y, 0.4f, Color.gray);
 
             DrawNodes();
             DrawConnections();
@@ -110,7 +119,44 @@ namespace KB.RLGUI.Display
                     }
 
                     break;
+
+                case EventType.ScrollWheel:
+
+                    OnZoom(current.delta);
+
+                    break;
             }
+        }
+
+        private void OnZoom(Vector2 delta)
+        {
+            Vector2 originalDelta = delta;
+
+            //Flip delta as Scroll up does a zoom out otherwise
+            if (delta.y < 0)
+            {
+                //_nodeZoom.y += 0.25f;
+                delta.y = 1.25f;
+                originalDelta.y = 1.25f;
+            }
+            else
+            {
+                //_nodeZoom.y -= 0.25f;
+                delta.y = 0.75f;
+                originalDelta.y = -1.25f;
+            }
+
+            _gridZoom += originalDelta;
+
+            foreach(Node node in _nodes)
+            {
+                //Use delta for nodes as otherwise it gets janky
+                node.Zoom(delta);
+            }
+
+            _templateNode.Zoom(delta);
+            
+            GUI.changed = true;
         }
 
         private void DisplayContextMenu(Vector2 mousePosition)
@@ -122,7 +168,7 @@ namespace KB.RLGUI.Display
 
         private void OnClickAddNode(Vector2 mousePosition)
         {
-            _nodes.Add(new Node("", new Rect(mousePosition, new Vector2(200, 50)), nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, OnClickInPoint, OnClickOutPoint, OnRemoveNode));
+            _nodes.Add(new Node(_templateNode, mousePosition, OnClickInPoint, OnClickOutPoint, OnRemoveNode));
         }
 
         private void OnRemoveNode(Node nodeToRemove)

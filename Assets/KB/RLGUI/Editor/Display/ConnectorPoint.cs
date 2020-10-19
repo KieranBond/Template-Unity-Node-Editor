@@ -26,6 +26,12 @@ namespace KB.RLGUI.Display
             _display = new Rect(0, 0, 10f, 20f);
         }
 
+        public void Zoom(Vector2 delta)
+        {
+            _display.width *= delta.y;
+            _display.height *= delta.y;
+        }
+
         public void Draw()
         {
             _display.y = Parent.Display.y + (Parent.Display.height * 0.5f) - _display.height * 0.5f;

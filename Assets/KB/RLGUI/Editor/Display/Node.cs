@@ -22,6 +22,21 @@ namespace KB.RLGUI.Display
 
         public Action<Node> OnRemoveNode { get; private set; }
 
+        public Node(Node toCopy, Vector2 mousePosition, Action<ConnectorPoint> onClickInPoint, Action<ConnectorPoint> onClickOutPoint, Action<Node> onClickRemoveNode)
+        {
+            Title = toCopy.Title;
+            _display = toCopy.Display;
+            _display.center = mousePosition;
+            DisplayStyle = toCopy.DefaultNodeStyle;
+            DefaultNodeStyle = toCopy.DefaultNodeStyle;
+            SelectedNodeStyle = toCopy.SelectedNodeStyle;
+
+            InPoint = new ConnectorPoint(this, VO.ConnectionType.In, toCopy.InPoint.Style, onClickInPoint);
+            OutPoint = new ConnectorPoint(this, VO.ConnectionType.Out, toCopy.OutPoint.Style, onClickOutPoint);
+
+            OnRemoveNode = onClickRemoveNode;
+        }
+
         public Node(string title, Rect display, GUIStyle nodeStyle, GUIStyle selectedNodeStyle, GUIStyle inPointStyle, GUIStyle outPointStyle, Action<ConnectorPoint> onClickInPoint, Action<ConnectorPoint> onClickOutPoint, Action<Node> onClickRemoveNode)
         {
             Title = title;
@@ -41,6 +56,15 @@ namespace KB.RLGUI.Display
             _display.position += delta;
         }
 
+        public void Zoom(Vector2 delta)
+        {
+            InPoint.Zoom(delta);
+            OutPoint.Zoom(delta);
+
+            _display.width *= delta.y;
+            _display.height *= delta.y;
+        }
+
         public void Draw()
         {
             InPoint.Draw();
@@ -55,7 +79,7 @@ namespace KB.RLGUI.Display
                 case EventType.MouseDown:
                     if(evt.button == 0)
                     {
-                        if (Display.Contains(evt.mousePosition))
+                        if (Display.Contains(evt.mousePosition, true))
                         {
                             IsDragged = true;
                             IsSelected = true;
@@ -69,12 +93,12 @@ namespace KB.RLGUI.Display
 
                         GUI.changed = true;
                     }
-                    else if(IsSelected && evt.button == 1)
+                    else if(evt.button == 1)
                     {
-                        if(Display.Contains(evt.mousePosition))
+                        if(Display.Contains(evt.mousePosition, true))
                         {
-                            DisplayContextMenu();
                             evt.Use();
+                            DisplayContextMenu();
                         }
                     }
 
