@@ -67,7 +67,7 @@ namespace KB.RLGUI.Display
             //Small lines
             DrawGrid(20, 0.2f, Color.gray);
             //Big lines
-            //DrawGrid(100, 0.4f, Color.gray);
+            DrawGrid(100, 0.4f, Color.gray);
 
             DrawNodes();
             DrawConnections();
@@ -78,34 +78,6 @@ namespace KB.RLGUI.Display
 
             if (GUI.changed)
                 Repaint();
-        }
-
-        private void DrawGrid(float gridSpacing, float gridOpacity, Color gridColor)
-        {
-            int widthDivs = Mathf.CeilToInt(position.width / gridSpacing);//Get number of vertical lines
-            int heightDivs = Mathf.CeilToInt(position.height / gridSpacing);//Get number of horizontal lines
-
-            Handles.BeginGUI();
-            gridColor.a = gridOpacity;
-            Handles.color = gridColor;
-
-            _gridOffset += _drag * 0.5f;
-            Vector3 newOffset = new Vector3(_gridOffset.x % gridSpacing, _gridOffset.y % gridSpacing, 0);
-            float leftBarOffset = _leftBar.width * 2f;
-
-            //Vertical lines
-            for (int x = 0; x < widthDivs; x++)
-            {
-                Handles.DrawLine(new Vector3(leftBarOffset + (gridSpacing * x), -gridSpacing, 0) + newOffset, new Vector3(leftBarOffset + (gridSpacing * x), position.height, 0f) + newOffset);
-            }
-            //Horizontal lines
-            for(int y = 0; y < heightDivs; y++)
-            {
-                Handles.DrawLine(new Vector3(leftBarOffset - -gridSpacing, gridSpacing * y, 0) + newOffset, new Vector3(position.width, gridSpacing * y, 0f) + newOffset);
-            }
-
-            Handles.color = Color.white;
-            Handles.EndGUI();
         }
 
         private void ProcessEvents(Event current)
@@ -287,22 +259,49 @@ namespace KB.RLGUI.Display
             float halfWidth = maxWidth * 0.5f;
 
 
-            //Left bar area
-            float leftBarWidth = halfWidth * 0.25f;//1/8th of screen
-            _leftBar = new Rect(0, 0, leftBarWidth, maxHeight);
-            using(var leftBarScope = new GUILayout.AreaScope(_leftBar))
-            {
-                GUILayout.Label("Classes", labelStyle);
-            }
+            ////Left bar area
+            //float leftBarWidth = halfWidth * 0.25f;//1/8th of screen
+            //_leftBar = new Rect(0, 0, leftBarWidth, maxHeight);
+            //using(var leftBarScope = new GUILayout.AreaScope(_leftBar))
+            //{
+            //    GUILayout.Label("Classes", labelStyle);
+            //}
 
             //Grid area
-            Rect gridArea = new Rect(leftBarWidth, 0, maxWidth - leftBarWidth, maxHeight);
+            Rect gridArea = new Rect(/*leftBarWidth*/0, 0, maxWidth /*- leftBarWidth*/, maxHeight);
             using(var gridScope = new GUILayout.AreaScope(gridArea))
             {
                 //Background texture tiling
-                //GUI.DrawTextureWithTexCoords(gridArea, gridBackgroundTex, gridBackgroundTexCoords);
+                GUI.DrawTextureWithTexCoords(gridArea, gridBackgroundTex, gridBackgroundTexCoords);
             }
 
+        }
+
+        private void DrawGrid(float gridSpacing, float gridOpacity, Color gridColor)
+        {
+            int widthDivs = Mathf.CeilToInt(position.width / gridSpacing);//Get number of vertical lines
+            int heightDivs = Mathf.CeilToInt(position.height / gridSpacing);//Get number of horizontal lines
+
+            Handles.BeginGUI();
+            gridColor.a = gridOpacity;
+            Handles.color = gridColor;
+
+            _gridOffset += _drag * 0.5f;
+            Vector3 newOffset = new Vector3(_gridOffset.x % gridSpacing, _gridOffset.y % gridSpacing, 0);
+
+            //Vertical lines
+            for (int x = 0; x < widthDivs; x++)
+            {
+                Handles.DrawLine(new Vector3(gridSpacing * x, -gridSpacing, 0) + newOffset, new Vector3(gridSpacing * x, position.height, 0f) + newOffset);
+            }
+            //Horizontal lines
+            for (int y = 0; y < heightDivs; y++)
+            {
+                Handles.DrawLine(new Vector3(-gridSpacing, gridSpacing * y, 0) + newOffset, new Vector3(position.width, gridSpacing * y, 0f) + newOffset);
+            }
+
+            Handles.color = Color.white;
+            Handles.EndGUI();
         }
 
         private void CreateBackgroundTextures()
