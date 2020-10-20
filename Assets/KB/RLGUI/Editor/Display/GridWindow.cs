@@ -54,11 +54,11 @@ namespace KB.RLGUI.Display
             _templateNode = new Node("", new Rect(Vector2.zero, new Vector2(50, 12.5f)), _zoom, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, OnClickInPoint, OnClickOutPoint, OnRemoveNode);
         }
 
-        [MenuItem("RLGUI/Open Grid")]
+        [MenuItem("Template/Open Grid")]
         static void Init()
         {
             //Get existing window or create one
-            GridWindow window = EditorWindow.GetWindow<GridWindow>("RLGUI Grid", true);
+            GridWindow window = EditorWindow.GetWindow<GridWindow>("Template Grid", true);
             window.Show();
         }
 
