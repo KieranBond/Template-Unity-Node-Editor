@@ -18,11 +18,9 @@ namespace KB.RLGUI.Display
         private Vector2 _gridOffset;
         private Vector2 _drag;
         private float _zoom = 1f;
-        private float _gridZoom;
+        private float _gridZoom = 1f;
 
-        private Rect _leftBar;
-
-        #region Styling
+        #region Styling Properties
 
         private static Texture2D gridBackgroundTex;
         private static Rect gridBackgroundTexCoords;
@@ -33,9 +31,6 @@ namespace KB.RLGUI.Display
         private static Texture2D inPointBackgroundTexActive;
         private static Texture2D outPointBackgroundTexNormal;
         private static Texture2D outPointBackgroundTexActive;
-
-        private static GUIStyle centeredStyle;
-        private static GUIStyle labelStyle;
 
         private static GUIStyle nodeStyle;
         private static GUIStyle selectedNodeStyle;
@@ -49,8 +44,6 @@ namespace KB.RLGUI.Display
             _nodes = new List<Node>();
             _connections = new List<Connector>();
 
-            _leftBar = new Rect(0, 0, 0, 0);
-
             CreateBackgroundTextures();
             CreateStyles();
             CreateTemplateNode();
@@ -58,7 +51,7 @@ namespace KB.RLGUI.Display
 
         private void CreateTemplateNode()
         {
-            _templateNode = new Node("", new Rect(Vector2.zero, new Vector2(200, 50)), _zoom, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, OnClickInPoint, OnClickOutPoint, OnRemoveNode);
+            _templateNode = new Node("", new Rect(Vector2.zero, new Vector2(50, 12.5f)), _zoom, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, OnClickInPoint, OnClickOutPoint, OnRemoveNode);
         }
 
         [MenuItem("RLGUI/Open Grid")]
@@ -134,15 +127,18 @@ namespace KB.RLGUI.Display
             if (delta.y < 0)
             {
                 _zoom += 0.25f;
-                delta.y = 1.25f;
+                delta.y = 1.125f;
             }
             else
             {
                 _zoom -= 0.25f;
-                delta.y = -1.25f;
+                delta.y = -1.125f;
             }
 
             _gridZoom += delta.y;
+
+            _gridZoom = Mathf.Clamp(_gridZoom, 0.125f, 9.125f);
+            _zoom = Mathf.Clamp(_zoom, 1f, 3f);
 
             foreach(Node node in _nodes)
             {
@@ -294,21 +290,10 @@ namespace KB.RLGUI.Display
         {
             Rect dimensions = position;
             float maxHeight = dimensions.size.y;
-            float halfHeight = maxHeight * 0.5f;
             float maxWidth = dimensions.size.x;
-            float halfWidth = maxWidth * 0.5f;
-
-
-            ////Left bar area
-            //float leftBarWidth = halfWidth * 0.25f;//1/8th of screen
-            //_leftBar = new Rect(0, 0, leftBarWidth, maxHeight);
-            //using(var leftBarScope = new GUILayout.AreaScope(_leftBar))
-            //{
-            //    GUILayout.Label("Classes", labelStyle);
-            //}
 
             //Grid area
-            Rect gridArea = new Rect(/*leftBarWidth*/0, 0, maxWidth /*- leftBarWidth*/, maxHeight);
+            Rect gridArea = new Rect(0, 0, maxWidth, maxHeight);
             using(var gridScope = new GUILayout.AreaScope(gridArea))
             {
                 //Background texture tiling
@@ -349,19 +334,6 @@ namespace KB.RLGUI.Display
             //Grid background
             gridBackgroundTex = new Texture2D(1, 1);
             gridBackgroundTex.SetPixel(0, 0, Color.black);
-            //gridBackgroundTex = new Texture2D(3, 3);
-            //gridBackgroundTex.SetPixel(0, 0, Color.white);
-            //gridBackgroundTex.SetPixel(1, 0, Color.black);
-            //gridBackgroundTex.SetPixel(2, 0, Color.white);
-
-            //gridBackgroundTex.SetPixel(0, 1, Color.black);
-            //gridBackgroundTex.SetPixel(1, 1, Color.black);
-            //gridBackgroundTex.SetPixel(2, 1, Color.black);
-
-            //gridBackgroundTex.SetPixel(0, 2, Color.white);
-            //gridBackgroundTex.SetPixel(1, 2, Color.black);
-            //gridBackgroundTex.SetPixel(2, 2, Color.white);
-
             gridBackgroundTex.Apply();
 
             gridBackgroundTexCoords = new Rect(0, 0, position.width / gridBackgroundTex.width, position.height / gridBackgroundTex.height);
@@ -369,12 +341,11 @@ namespace KB.RLGUI.Display
             //Node background
             nodeBackgroundTex = new Texture2D(1, 1);
             nodeBackgroundTex.SetPixel(0, 0, Color.grey);
-
             nodeBackgroundTex.Apply();
+
 
             selectedNodeBackgroundTex = new Texture2D(1, 1);
             selectedNodeBackgroundTex.SetPixel(0, 0, new Color(0.25f, 0.25f, 0.25f));
-            
             selectedNodeBackgroundTex.Apply();
 
             //Node connector 
@@ -382,7 +353,6 @@ namespace KB.RLGUI.Display
             inPointBackgroundTexActive = new Texture2D(1, 1);
             inPointBackgroundTexNormal.SetPixel(0, 0, Color.white);
             inPointBackgroundTexActive.SetPixel(0, 0, Color.green);
-
             inPointBackgroundTexNormal.Apply();
             inPointBackgroundTexActive.Apply();
 
@@ -390,28 +360,12 @@ namespace KB.RLGUI.Display
             outPointBackgroundTexActive = new Texture2D(1, 1);
             outPointBackgroundTexNormal.SetPixel(0, 0, Color.red);
             outPointBackgroundTexActive.SetPixel(0, 0, Color.blue);
-
             outPointBackgroundTexNormal.Apply();
             outPointBackgroundTexActive.Apply();
         }
 
         private void CreateStyles()
         {
-            //Centered
-            centeredStyle = new GUIStyle();
-            centeredStyle.alignment = TextAnchor.MiddleCenter;
-
-            //Label
-            labelStyle = new GUIStyle();
-
-            labelStyle.padding = new RectOffset(100, 0, 15, 5);
-            labelStyle.stretchWidth = true;
-            labelStyle.stretchHeight = true;
-            labelStyle.richText = true;
-            labelStyle.alignment = TextAnchor.UpperCenter;
-            //labelStyle.fontStyle = FontStyle.Bold;
-            labelStyle.normal.textColor = Color.white;
-
             //Node
             nodeStyle = new GUIStyle();
             nodeStyle.normal.background = nodeBackgroundTex;

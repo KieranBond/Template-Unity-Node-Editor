@@ -24,7 +24,7 @@ namespace KB.RLGUI.Display
             ConnectionType = connectionType;
             Style = style;
             OnClickConnectionPoint = onClickConnectionPoint;
-            _display = new Rect(0, 0, 10f, 20f);
+            _display = new Rect(0, 0, parentNode.Display.width * 0.05f, parentNode.Display.height * 0.6f);
             _originalDisplay = new Rect(_display);
         }
 
@@ -36,19 +36,22 @@ namespace KB.RLGUI.Display
 
         public void Draw()
         {
+            //Half height of parent - In the middle
             _display.y = Parent.Display.y + (Parent.Display.height * 0.5f) - _display.height * 0.5f;
 
-            switch(ConnectionType)
+
+            //Modify the _display.width * x section to change how far sunk in this is
+            switch (ConnectionType)
             {
                 case ConnectionType.In:
 
-                    _display.x = Parent.Display.x - _display.width + 8f;
+                    _display.x = Parent.Display.x - (_display.width * 0.75f);
 
                     break;
 
                 case ConnectionType.Out:
 
-                    _display.x = Parent.Display.x + Parent.Display.width - 8f;
+                    _display.x = Parent.Display.x + Parent.Display.width - (_display.width * 0.25f);
 
                     break;
             }
