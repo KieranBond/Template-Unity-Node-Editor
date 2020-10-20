@@ -8,6 +8,7 @@ namespace KB.RLGUI.Display
     {
         public Rect Display { get { return _display; } }
         private Rect _display;
+        private Rect _originalDisplay;
 
         public GUIStyle Style { get; private set; }
 
@@ -24,12 +25,13 @@ namespace KB.RLGUI.Display
             Style = style;
             OnClickConnectionPoint = onClickConnectionPoint;
             _display = new Rect(0, 0, 10f, 20f);
+            _originalDisplay = new Rect(_display);
         }
 
-        public void Zoom(Vector2 delta)
+        public void Zoom(float delta)
         {
-            _display.width *= delta.y;
-            _display.height *= delta.y;
+            _display.width = _originalDisplay.width * delta;
+            _display.height = _originalDisplay.height * delta;
         }
 
         public void Draw()

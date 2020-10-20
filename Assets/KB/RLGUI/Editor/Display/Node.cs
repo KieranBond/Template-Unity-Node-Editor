@@ -11,6 +11,7 @@ namespace KB.RLGUI.Display
 
         public Rect Display { get { return _display; } }
         private Rect _display;
+        private Rect _originalDisplay;
 
         public string Title { get; private set; }
         public GUIStyle DisplayStyle { get; private set; }
@@ -22,25 +23,19 @@ namespace KB.RLGUI.Display
 
         public Action<Node> OnRemoveNode { get; private set; }
 
-        public Node(Node toCopy, Vector2 mousePosition, Action<ConnectorPoint> onClickInPoint, Action<ConnectorPoint> onClickOutPoint, Action<Node> onClickRemoveNode)
+        public Node(Node toCopy, string title, Vector2 mousePosition, float zoomLevel, 
+            Action<ConnectorPoint> onClickInPoint, Action<ConnectorPoint> onClickOutPoint,  Action<Node> onClickRemoveNode) : 
+            this(title, toCopy.Display, zoomLevel, toCopy.DefaultNodeStyle, toCopy.SelectedNodeStyle, toCopy.InPoint.Style, 
+            toCopy.OutPoint.Style, onClickInPoint, onClickOutPoint, onClickRemoveNode)
         {
-            Title = toCopy.Title;
-            _display = toCopy.Display;
             _display.center = mousePosition;
-            DisplayStyle = toCopy.DefaultNodeStyle;
-            DefaultNodeStyle = toCopy.DefaultNodeStyle;
-            SelectedNodeStyle = toCopy.SelectedNodeStyle;
-
-            InPoint = new ConnectorPoint(this, VO.ConnectionType.In, toCopy.InPoint.Style, onClickInPoint);
-            OutPoint = new ConnectorPoint(this, VO.ConnectionType.Out, toCopy.OutPoint.Style, onClickOutPoint);
-
-            OnRemoveNode = onClickRemoveNode;
         }
 
-        public Node(string title, Rect display, GUIStyle nodeStyle, GUIStyle selectedNodeStyle, GUIStyle inPointStyle, GUIStyle outPointStyle, Action<ConnectorPoint> onClickInPoint, Action<ConnectorPoint> onClickOutPoint, Action<Node> onClickRemoveNode)
+        public Node(string title, Rect display, float zoomLevel, GUIStyle nodeStyle, GUIStyle selectedNodeStyle, GUIStyle inPointStyle, GUIStyle outPointStyle, Action<ConnectorPoint> onClickInPoint, Action<ConnectorPoint> onClickOutPoint, Action<Node> onClickRemoveNode)
         {
             Title = title;
             _display = display;
+            _originalDisplay = new Rect(_display);
             DisplayStyle = nodeStyle;
             DefaultNodeStyle = nodeStyle;
             SelectedNodeStyle = selectedNodeStyle;
@@ -49,6 +44,8 @@ namespace KB.RLGUI.Display
             OutPoint = new ConnectorPoint(this, VO.ConnectionType.Out, outPointStyle, onClickOutPoint);
 
             OnRemoveNode = onClickRemoveNode;
+
+            Zoom(zoomLevel);
         }
 
         public void Drag(Vector2 delta)
@@ -56,13 +53,13 @@ namespace KB.RLGUI.Display
             _display.position += delta;
         }
 
-        public void Zoom(Vector2 delta)
+        public void Zoom(float delta)
         {
             InPoint.Zoom(delta);
             OutPoint.Zoom(delta);
 
-            _display.width *= delta.y;
-            _display.height *= delta.y;
+            _display.width = _originalDisplay.width * delta;
+            _display.height = _originalDisplay.height * delta;
         }
 
         public void Draw()
