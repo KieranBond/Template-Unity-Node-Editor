@@ -97,7 +97,15 @@ namespace KB.RLGUI.Display
             switch(current.type)
             {
                 case EventType.MouseDown:
-                    if(current.button == 1)
+                    if(current.button == 0)
+                    {
+                        if(_selectedInPoint != null ^ _selectedOutPoint != null)//If only one is null, we've clicked away
+                        {
+                            _selectedInPoint = null;
+                            _selectedOutPoint = null;
+                        }
+                    }
+                    else if(current.button == 1)
                     {
                         DisplayContextMenu(current.mousePosition);
                     }
