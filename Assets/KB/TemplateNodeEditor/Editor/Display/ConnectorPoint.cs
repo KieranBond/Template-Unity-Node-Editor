@@ -1,8 +1,8 @@
-﻿using KB.RLGUI.Display.VO;
+﻿using KB.TemplateNodeEditor.Display.VO;
 using System;
 using UnityEngine;
 
-namespace KB.RLGUI.Display
+namespace KB.TemplateNodeEditor.Display
 {
     public class ConnectorPoint
     {

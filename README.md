@@ -1,5 +1,7 @@
-# RLGUI
-A Node based GUI for RobotLegs in Unity 
+# Template-Unity-Node-Editor
+A Node based Editor GUI template for Unity 
+
+## Built with Unity 2019.4.12f1
 
 
 # Shoutouts

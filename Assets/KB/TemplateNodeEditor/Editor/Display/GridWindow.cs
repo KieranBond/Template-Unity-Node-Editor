@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace KB.RLGUI.Display
+namespace KB.TemplateNodeEditor.Display
 {
     public class GridWindow : EditorWindow
     {
