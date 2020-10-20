@@ -99,7 +99,7 @@ namespace KB.RLGUI.Display
                 case EventType.MouseDown:
                     if(current.button == 0)
                     {
-                        if(_selectedInPoint != null ^ _selectedOutPoint != null)//If only one is null, we've clicked away
+                        if(_selectedInPoint != null ^ _selectedOutPoint != null)//If only one is null, we've clicked away to cancel
                         {
                             _selectedInPoint = null;
                             _selectedOutPoint = null;
@@ -124,6 +124,19 @@ namespace KB.RLGUI.Display
                 case EventType.ScrollWheel:
 
                     OnZoom(current.delta);
+
+                    break;
+
+                case EventType.KeyDown:
+
+                    if(current.keyCode == KeyCode.Escape)
+                    {
+                        if(_selectedInPoint != null ^ _selectedOutPoint != null)//If only one is not null and we've pressed esc, kill it
+                        {
+                            _selectedInPoint = null;
+                            _selectedOutPoint = null;
+                        }
+                    }
 
                     break;
             }
